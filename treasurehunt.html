@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>007 Strikes Again — Mission Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg0:#050506;
+    --bg1:#0c0c0e;
+    --panel:#131315;
+    --panel-2:#1a1a1d;
+    --gold:#c9a227;
+    --gold-light:#e8c766;
+    --gold-dim:rgba(201,162,39,0.35);
+    --red:#9a2029;
+    --red-light:#c9494f;
+    --cream:#ece6d6;
+    --cream-dim:rgba(236,230,214,0.62);
+    --signal:#5fae7a;
+    --shadow: rgba(0,0,0,0.65);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 50% 8%, rgba(154,32,41,0.22), transparent 45%),
+      radial-gradient(ellipse at 50% 100%, rgba(201,162,39,0.08), transparent 60%),
+      linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%);
+    font-family:'Spectral', serif;
+    color:var(--cream);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 18px;
+    position:relative;
+    overflow-x:hidden;
+    -webkit-user-select:none;
+    user-select:none;
+  }
+
+  /* faint surveillance-grid texture */
+  body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(201,162,39,0.3) 0, transparent 100%),
+      radial-gradient(1px 1px at 80% 10%, rgba(201,162,39,0.2) 0, transparent 100%),
+      radial-gradient(1.5px 1.5px at 60% 70%, rgba(201,162,39,0.25) 0, transparent 100%),
+      radial-gradient(1px 1px at 30% 85%, rgba(201,162,39,0.2) 0, transparent 100%),
+      radial-gradient(1px 1px at 92% 60%, rgba(201,162,39,0.25) 0, transparent 100%),
+      radial-gradient(1.5px 1.5px at 45% 35%, rgba(201,162,39,0.15) 0, transparent 100%);
+    pointer-events:none;
+  }
+
+  .stage{
+    width:100%;
+    max-width:640px;
+    position:relative;
+    z-index:1;
+  }
+
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    margin:0;
+    color:var(--gold-light);
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+    opacity:0.85;
+  }
+
+  /* ============ GATE (access terminal) ============ */
+  #gate{
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border-radius:6px;
+    padding:56px 44px 44px;
+    box-shadow: 0 30px 70px var(--shadow), 0 0 0 1px rgba(201,162,39,0.08) inset;
+    text-align:center;
+    position:relative;
+    border:1px solid var(--gold-dim);
+  }
+  #gate::before{
+    content:'';
+    position:absolute;
+    top:0; left:0; right:0; height:3px;
+    background:repeating-linear-gradient(90deg, var(--gold) 0 10px, transparent 10px 14px);
+    opacity:0.55;
+  }
+  .corner-hud{ position:relative; }
+  .corner-hud::before, .corner-hud::after{
+    content:'';
+    position:absolute;
+    width:20px; height:20px;
+    border-color:var(--gold);
+    border-style:solid;
+    opacity:0.75;
+    pointer-events:none;
+  }
+  .corner-hud::before{ top:10px; left:10px; border-width:2px 0 0 2px; }
+  .corner-hud::after{ bottom:10px; right:10px; border-width:0 2px 2px 0; }
+
+  .seal{
+    width:104px; height:104px;
+    margin:0 auto 26px;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 50%, #000 0%, #000 38%, #1c1c1c 39%, #1c1c1c 46%, #000 47%, #000 60%, var(--gold) 61%, var(--gold) 65%, #000 66%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.6), 0 0 0 3px rgba(201,162,39,0.25);
+    position:relative;
+    transition: transform 0.6s cubic-bezier(.22,1,.36,1), box-shadow 0.6s ease;
+  }
+  .seal svg{ width:40px; height:40px; position:relative; z-index:1; }
+  .seal.cracked{
+    transform: scale(1.08);
+    box-shadow: 0 4px 14px rgba(95,174,122,0.35), 0 0 0 3px rgba(95,174,122,0.35);
+  }
+  .seal-crack{
+    position:absolute; inset:0;
+    border-radius:50%;
+    opacity:0;
+    transition: opacity 0.5s ease 0.15s;
+  }
+  .seal.cracked .seal-crack{ opacity:1; }
+
+  #gate h1{ font-size:30px; font-weight:700; letter-spacing:0.04em; margin-bottom:6px; }
+  #gate p.sub{ color:var(--cream-dim); font-size:15px; margin:10px 0 30px; line-height:1.6; }
+
+  .pw-row{
+    display:flex;
+    gap:10px;
+    max-width:360px;
+    margin:0 auto;
+  }
+  input#pw{
+    flex:1;
+    font-family:'JetBrains Mono', monospace;
+    font-size:15px;
+    letter-spacing:0.05em;
+    padding:13px 14px;
+    border-radius:4px;
+    border:1.5px solid var(--gold-dim);
+    background:rgba(255,255,255,0.04);
+    color:var(--cream);
+    outline:none;
+    -webkit-user-select:text;
+    user-select:text;
+    transition:border-color 0.2s ease, background 0.2s ease;
+  }
+  input#pw:focus{ border-color:var(--gold); background:rgba(255,255,255,0.07); }
+  input#pw.wrong{ border-color:var(--red-light); animation:shake 0.4s ease; }
+
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-6px);}
+    40%{transform:translateX(6px);}
+    60%{transform:translateX(-4px);}
+    80%{transform:translateX(4px);}
+  }
+
+  button{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    border:none;
+    border-radius:4px;
+    padding:13px 20px;
+    background:var(--gold);
+    color:#0a0a0c;
+    font-weight:600;
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  button:hover{ background:var(--gold-light); transform:translateY(-1px); }
+  button:active{ transform:translateY(0); }
+  button:disabled{ opacity:0.4; cursor:not-allowed; transform:none; }
+
+  #pw-msg{
+    min-height:20px;
+    margin-top:14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--red-light);
+  }
+
+  /* ============ HUNT ============ */
+  #hunt{ display:none; }
+
+  .hunt-header{
+    text-align:center;
+    margin-bottom:28px;
+  }
+  .hunt-header h1{
+    font-size:28px;
+    font-weight:700;
+    letter-spacing:0.04em;
+    color:var(--gold-light);
+    margin:8px 0 4px;
+  }
+
+  .path{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    margin:22px 0 34px;
+    flex-wrap:wrap;
+  }
+  .leg{
+    display:flex; align-items:center; justify-content:center;
+    width:32px; height:32px;
+    border-radius:50%;
+    border:1.5px solid var(--gold-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:rgba(236,230,214,0.45);
+    background:rgba(255,255,255,0.03);
+    transition: all 0.4s ease;
+    flex-shrink:0;
+  }
+  .leg.done{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:#0a0a0c;
+  }
+  .leg.current{
+    border-color:var(--red-light);
+    color:var(--red-light);
+    box-shadow:0 0 0 4px rgba(154,32,41,0.18);
+  }
+  .connector{
+    width:16px; height:1.5px;
+    background:repeating-linear-gradient(90deg, var(--gold-dim) 0 4px, transparent 4px 8px);
+  }
+
+  .card{
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border-radius:6px;
+    padding:40px 38px;
+    box-shadow: 0 24px 60px var(--shadow);
+    animation: unroll 0.55s cubic-bezier(.22,1,.36,1);
+    border:1px solid var(--gold-dim);
+    position:relative;
+    -webkit-user-select:text;
+    user-select:text;
+  }
+  .card::before, .card::after{
+    content:'';
+    position:absolute;
+    width:20px; height:20px;
+    border-color:var(--gold);
+    border-style:solid;
+    opacity:0.75;
+    pointer-events:none;
+  }
+  .card::before{ top:10px; left:10px; border-width:2px 0 0 2px; }
+  .card::after{ bottom:10px; right:10px; border-width:0 2px 2px 0; }
+  @keyframes unroll{
+    from{ opacity:0; transform: translateY(14px) scaleY(0.97); transform-origin:top; }
+    to{ opacity:1; transform: translateY(0) scaleY(1); }
+  }
+
+  .card .eyebrow{ margin-bottom:10px; }
+  .card h2{ font-size:22px; font-weight:600; line-height:1.35; margin-bottom:14px; }
+  .card .instructions{
+    font-size:14.5px;
+    line-height:1.7;
+    color:var(--cream-dim);
+    border-left:2.5px solid var(--gold);
+    padding-left:16px;
+    margin-bottom:24px;
+  }
+
+  .feedback{
+    min-height:20px;
+    margin-top:14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--red-light);
+  }
+
+  .puzzle-mount{ margin-bottom:2px; }
+
+  /* ---- signal recall (memory) ---- */
+  .memory-status{
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--cream-dim);
+    margin-bottom:14px;
+    min-height:16px;
+  }
+  .memory-pad{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    max-width:220px;
+    margin:0 auto 18px;
+  }
+  .memory-btn{
+    aspect-ratio:1;
+    border-radius:10px;
+    border:2px solid rgba(0,0,0,0.4);
+    font-family:'JetBrains Mono', monospace;
+    font-size:15px;
+    font-weight:700;
+    color:#0a0a0c;
+    display:flex; align-items:center; justify-content:center;
+    transition: transform .1s ease, filter .15s ease;
+    opacity:0.82;
+  }
+  .memory-btn.lit{ filter:brightness(1.3); transform:scale(1.06); opacity:1; }
+
+  /* ---- vault combination (mastermind) ---- */
+  .mm-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+  .mm-swatch{
+    width:32px; height:32px; padding:0;
+    border-radius:50%;
+    border:2px solid rgba(0,0,0,0.4);
+  }
+  .mm-slot{
+    width:32px; height:32px; padding:0;
+    border-radius:50%;
+    border:2px dashed var(--gold-dim);
+    background:rgba(255,255,255,0.03);
+  }
+  .mm-slot.filled{ border-style:solid; border-color:var(--gold); }
+  .mm-attempts{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--cream-dim);
+    margin-left:auto;
+  }
+  .mm-history{ max-height:230px; overflow-y:auto; margin-top:6px; }
+  .mm-history-row{
+    display:flex; align-items:center; gap:14px;
+    padding:8px 2px;
+    border-bottom:1px solid rgba(201,162,39,0.12);
+  }
+  .mm-history-guess{ display:flex; gap:6px; }
+  .mm-mini-dot{
+    width:15px; height:15px; border-radius:50%;
+    display:inline-block; border:1px solid rgba(0,0,0,0.4);
+  }
+  .mm-mini-grid{
+    display:grid; grid-template-columns:repeat(2,9px); gap:3px; width:21px;
+  }
+  .mm-mini{ width:9px; height:9px; border-radius:50%; }
+  .mm-mini.black{ background:var(--gold); }
+  .mm-mini.white{ background:var(--cream); border:1px solid rgba(0,0,0,0.5); }
+  .mm-mini.none{ background:transparent; }
+
+  /* ---- enigma intercept (cipher wheel) ---- */
+  .cipher-display{
+    font-family:'JetBrains Mono', monospace;
+    font-size:20px;
+    letter-spacing:0.18em;
+    text-align:center;
+    background:#000;
+    color:var(--gold-light);
+    padding:16px 10px;
+    border-radius:4px;
+    border:1px solid var(--gold-dim);
+    margin-bottom:16px;
+    word-break:break-all;
+  }
+  .cipher-controls{
+    display:flex; align-items:center; justify-content:center;
+    gap:18px;
+    margin-bottom:12px;
+  }
+  .wheel-btn{
+    width:44px; height:44px;
+    padding:0;
+    border-radius:50%;
+    font-size:18px;
+  }
+  .cipher-offset{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--cream-dim);
+    min-width:70px;
+    text-align:center;
+  }
+  .cipher-preview{
+    font-family:'JetBrains Mono', monospace;
+    font-size:18px;
+    letter-spacing:0.18em;
+    text-align:center;
+    color:var(--cream);
+    min-height:26px;
+    margin-bottom:18px;
+    word-break:break-all;
+  }
+
+  /* ---- recovered blueprint (sliding puzzle) ---- */
+  .slide-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 58px);
+    grid-template-rows:repeat(4, 58px);
+    gap:5px;
+    justify-content:center;
+    margin:0 auto 12px;
+  }
+  .slide-tile{
+    background:var(--gold);
+    color:#0a0a0c;
+    font-family:'Fraunces', serif;
+    font-size:19px;
+    font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:4px;
+    cursor:pointer;
+    user-select:none;
+    transition: background 0.15s ease;
+  }
+  .slide-tile:hover{ background:var(--gold-light); }
+  .slide-tile.blank{ background:transparent; cursor:default; }
+  .slide-moves{
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--cream-dim);
+    margin-bottom:8px;
+  }
+
+  /* ---- compound infiltration (maze) ---- */
+  .maze-wrap{ display:flex; justify-content:center; margin-bottom:16px; }
+  .maze-grid{
+    display:grid;
+    background:rgba(255,255,255,0.03);
+    outline:none;
+  }
+  .maze-cell{ width:26px; height:26px; box-sizing:border-box; border:1px solid rgba(255,255,255,0.04); }
+  .maze-cell.maze-player{ background:var(--red-light); }
+  .maze-cell.maze-exit{ background:var(--signal); }
+  .maze-cell.maze-player.maze-exit{ background:linear-gradient(135deg, var(--red-light) 50%, var(--signal) 50%); }
+  .maze-dpad{ display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .maze-dpad .maze-dpad-mid{ display:flex; gap:44px; }
+  .maze-dpad button{ width:40px; height:40px; padding:0; font-size:13px; }
+  .maze-hint{
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--cream-dim);
+    margin-top:10px;
+  }
+
+  /* ---- security override (lights out) ---- */
+  .lo-grid{
+    display:grid;
+    gap:6px;
+    justify-content:center;
+    margin:0 auto 14px;
+  }
+  .lo-cell{
+    width:44px; height:44px;
+    padding:0;
+    border-radius:4px;
+    background:rgba(255,255,255,0.04);
+    border:1.5px solid var(--gold-dim);
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+  .lo-cell.lit{
+    background:var(--red);
+    border-color:var(--red-light);
+    box-shadow:0 0 12px rgba(201,73,79,0.55);
+  }
+  .lo-status{
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--cream-dim);
+    margin-bottom:12px;
+  }
+
+  /* ---- signal interception (frequency tuner) ---- */
+  .freq-row{ display:flex; gap:10px; max-width:320px; margin:0 auto 16px; }
+  input.freq-input{
+    flex:1;
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px;
+    text-align:center;
+    padding:13px 14px;
+    border-radius:4px;
+    border:1.5px solid var(--gold-dim);
+    background:rgba(255,255,255,0.04);
+    color:var(--cream);
+    outline:none;
+  }
+  input.freq-input:focus{ border-color:var(--gold); }
+  .freq-meter{
+    width:100%;
+    max-width:320px;
+    height:10px;
+    margin:0 auto 14px;
+    border-radius:5px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--gold-dim);
+    overflow:hidden;
+  }
+  .freq-meter-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--red) 0%, var(--gold) 60%, var(--signal) 100%);
+    transition: width 0.3s ease;
+  }
+  .freq-readout{
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color:var(--cream-dim);
+    margin-bottom:16px;
+    min-height:18px;
+  }
+
+  /* ---- defuse the device (wire cut) ---- */
+  .wire-rack{ display:flex; flex-direction:column; gap:12px; margin-bottom:6px; }
+  .wire-row{ display:flex; align-items:center; gap:14px; cursor:pointer; }
+  .wire-strip{
+    flex:1;
+    height:14px;
+    border-radius:7px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .wire-row:hover .wire-strip{ transform:scaleY(1.3); box-shadow:0 0 10px rgba(201,162,39,0.4); }
+  .wire-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--cream-dim);
+    width:20px;
+  }
+
+  /* ============ MISSION COMPLETE ============ */
+  #treasure{ display:none; text-align:center; }
+  .briefcase{
+    width:120px; height:90px;
+    margin:0 auto 28px;
+  }
+  #treasure .card{ padding:48px 38px; }
+  #treasure h2{ font-size:25px; margin-bottom:12px; }
+  #treasure p{ color:var(--cream-dim); line-height:1.7; margin-bottom:22px; }
+  .code-box{
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px;
+    letter-spacing:0.1em;
+    background:#000;
+    color:var(--gold-light);
+    padding:16px;
+    border-radius:4px;
+    border:1px solid var(--gold-dim);
+    margin:0 0 8px;
+  }
+  .code-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:var(--cream-dim);
+    opacity:0.8;
+    margin-bottom:26px;
+  }
+
+  footer.credit{
+    text-align:center;
+    margin-top:22px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:rgba(201,162,39,0.4);
+    letter-spacing:0.05em;
+  }
+
+  @media (max-width:480px){
+    #gate{ padding:44px 26px 34px; }
+    .card{ padding:30px 24px; }
+    .slide-grid{ grid-template-columns:repeat(4, 50px); grid-template-rows:repeat(4, 50px); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ ACCESS TERMINAL ============ -->
+  <div class="stage" id="gate-wrap">
+    <div id="gate" class="corner-hud">
+      <div class="seal" id="seal">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="#e8c766" stroke-width="1.2"/>
+          <path d="M12 3V21M3 12H21" stroke="#e8c766" stroke-width="1" opacity="0.6"/>
+          <circle cx="12" cy="12" r="2" fill="#9a2029"/>
+        </svg>
+        <svg class="seal-crack" viewBox="0 0 104 104">
+          <circle cx="52" cy="52" r="6" fill="#5fae7a"/>
+        </svg>
+      </div>
+      <div class="eyebrow">Top Secret // MI6 Clearance Required</div>
+      <h1>007 STRIKES AGAIN</h1>
+      <p class="sub">This terminal is sealed behind a classified access code.<br>Authenticate to receive your mission briefing — eight trials stand between you and extraction.</p>
+      <div class="pw-row">
+        <input type="password" id="pw" placeholder="Enter access code" autocomplete="off">
+        <button id="unlockBtn">Authenticate</button>
+      </div>
+      <div id="pw-msg"></div>
+    </div>
+  </div>
+
+  <!-- ============ MISSION ============ -->
+  <div class="stage" id="hunt">
+    <div class="hunt-header">
+      <div class="eyebrow">Mission Phase <span id="legNum">1</span> of <span id="legTotal">8</span></div>
+      <h1>007 STRIKES AGAIN</h1>
+    </div>
+    <div class="path" id="path"></div>
+    <div class="card" id="clueCard"></div>
+    <footer class="credit">each phase cleared brings extraction closer</footer>
+  </div>
+
+  <!-- ============ MISSION COMPLETE ============ -->
+  <div class="stage" id="treasure">
+    <div class="card">
+      <svg class="briefcase" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="12" y="30" width="96" height="16" rx="3" fill="#c9a227"/>
+        <rect x="20" y="30" width="80" height="8" fill="#0a0a0c"/>
+        <rect x="10" y="38" width="100" height="42" rx="4" fill="#131315" stroke="#c9a227" stroke-width="2"/>
+        <rect x="50" y="52" width="20" height="14" rx="2" fill="#c9a227"/>
+        <circle cx="60" cy="59" r="2.5" fill="#0a0a0c"/>
+      </svg>
+      <div class="eyebrow">Objective Secured</div>
+      <h2>Mission Accomplished</h2>
+      <p>Every phase cleared, every lock broken. MI6 has confirmed the objective — extraction is authorized. Your dossier is downloading now.</p>
+      <div class="code-box" id="treasureCode">W3lcome123</div>
+      <div class="code-label">password to your inbox</div>
+    </div>
+    <footer class="credit">mission complete — extract immediately</footer>
+  </div>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================
+   The access code is stored below as a SHA-256 hash, not plain
+   text, so opening this file or the browser's "Inspect" panel
+   doesn't just hand someone the code. To change it, open a
+   browser console anywhere and run:
+
+     crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourNewCode'))
+       .then(b => console.log([...new Uint8Array(b)]
+         .map(x => x.toString(16).padStart(2,'0')).join('')))
+
+   then paste the printed hash in as PASSWORD_HASH below.
+
+   Note on "no inspecting the answers": none of the eight trials
+   below store a plain-text answer anywhere in this file. Each
+   one is procedurally generated at random the moment the mission
+   unlocks (a fresh shuffle, a fresh vault code, a fresh cipher
+   shift, a fresh maze, a fresh frequency, a fresh wire set) and
+   lives only in memory while it's being solved — reading the
+   source shows you *how* a trial is built, not what this
+   session's solution is. Right-click and common devtools
+   shortcuts are also disabled below as a mild deterrent. None of
+   this is bulletproof against someone who really wants to dig
+   through runtime memory with a debugger — nothing client-side
+   ever is — but it removes the "peek at the answer in the HTML"
+   shortcut entirely.
+   ============================================================ */
+
+const PASSWORD_HASH = "247f28941e31f8ab665ad4565627a07cad43d95a885027249da2466774f441f9";
+
+/* ============================================================
+   Deterrents — casual right-click / devtools shortcuts only.
+   ============================================================ */
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  const blocked =
+    k === 'f12' ||
+    (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k)) ||
+    (e.metaKey && e.altKey && ['i','j','c'].includes(k)) ||
+    (e.ctrlKey && k === 'u') ||
+    (e.metaKey && k === 'u');
+  if (blocked) e.preventDefault();
+});
+
+/* ============================================================
+   Access terminal
+   ============================================================ */
+
+async function sha256Hex(text){
+  const bytes = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+const gateWrap = document.getElementById('gate-wrap');
+const huntEl = document.getElementById('hunt');
+const treasureEl = document.getElementById('treasure');
+const pwInput = document.getElementById('pw');
+const pwMsg = document.getElementById('pw-msg');
+const seal = document.getElementById('seal');
+const unlockBtn = document.getElementById('unlockBtn');
+
+async function tryUnlock(){
+  unlockBtn.disabled = true;
+  const hash = await sha256Hex(pwInput.value);
+  unlockBtn.disabled = false;
+
+  if (hash === PASSWORD_HASH){
+    seal.classList.add('cracked');
+    pwMsg.style.color = 'var(--signal)';
+    pwMsg.textContent = 'Access granted. Loading mission briefing...';
+    setTimeout(() => {
+      gateWrap.style.display = 'none';
+      huntEl.style.display = 'block';
+      LEVELS = shuffleArray(buildLevels());
+      current = 0;
+      renderPath();
+      renderClue();
+    }, 650);
+  } else {
+    pwInput.classList.add('wrong');
+    pwMsg.style.color = 'var(--red-light)';
+    pwMsg.textContent = 'Access denied. Re-enter clearance code.';
+    setTimeout(() => pwInput.classList.remove('wrong'), 400);
+  }
+}
+
+unlockBtn.addEventListener('click', tryUnlock);
+pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+
+/* ============================================================
+   Level framework — each build*Level() returns a fresh,
+   randomly-generated puzzle instance with:
+     { title, heading, blurb, mount(container, onSolved, feedback) }
+   mount() wires up the DOM and calls onSolved() once the
+   player has actually solved the puzzle (not typed a lookup).
+   ============================================================ */
+
+let LEVELS = [];
+let current = 0;
+
+function shuffleArray(arr){
+  for (let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* ---- Trial: signal recall (memory sequence) ---- */
+function buildMemoryLevel(){
+  const symbols = [
+    { label: 'N', color: '#c9a227' },
+    { label: 'E', color: '#9a2029' },
+    { label: 'S', color: '#5fae7a' },
+    { label: 'W', color: '#3f5f8a' }
+  ];
+  function rollSequence(){
+    const length = 8 + Math.floor(Math.random() * 3); // 8-10
+    return Array.from({ length }, () => Math.floor(Math.random() * 4));
+  }
+  let sequence = rollSequence();
+
+  return {
+    title: 'Signal Recall',
+    heading: 'Repeat the transmitted sequence',
+    blurb: "Q Branch is testing your recall under pressure. A burst of directional signals will flash across the panel — fast, and only once. Watch closely, then tap them back in the exact order transmitted. Break the sequence and a fresh one is transmitted in its place.",
+    mount(container, onSolved, feedback){
+      let progress = 0;
+      let playing = true;
+
+      container.innerHTML = `
+        <div class="memory-status" id="mStatus">Watch the sequence...</div>
+        <div class="memory-pad" id="mPad">
+          ${symbols.map((s, i) => `<button class="memory-btn" data-i="${i}" style="background:${s.color}" type="button">${s.label}</button>`).join('')}
+        </div>
+      `;
+
+      const buttons = [...container.querySelectorAll('.memory-btn')];
+      const status = container.querySelector('#mStatus');
+
+      function setEnabled(en){ buttons.forEach(b => b.disabled = !en); }
+
+      async function play(){
+        playing = true;
+        setEnabled(false);
+        status.textContent = 'Watch the sequence...';
+        await new Promise(r => setTimeout(r, 500));
+        for (const idx of sequence){
+          buttons[idx].classList.add('lit');
+          await new Promise(r => setTimeout(r, 280));
+          buttons[idx].classList.remove('lit');
+          await new Promise(r => setTimeout(r, 130));
+        }
+        status.textContent = 'Now repeat it back.';
+        playing = false;
+        progress = 0;
+        setEnabled(true);
+      }
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (playing) return;
+          const idx = Number(btn.dataset.i);
+          btn.classList.add('lit');
+          setTimeout(() => btn.classList.remove('lit'), 180);
+
+          if (idx === sequence[progress]){
+            progress++;
+            if (progress === sequence.length){
+              setEnabled(false);
+              status.textContent = 'Sequence confirmed.';
+              onSolved();
+            }
+          } else {
+            feedback.style.color = 'var(--red-light)';
+            feedback.textContent = 'That breaks the sequence. A new burst is coming through.';
+            sequence = rollSequence();
+            play();
+          }
+        });
+      });
+
+      play();
+    }
+  };
+}
+
+/* ---- Trial: vault combination (mastermind-style) ---- */
+function buildMastermindLevel(){
+  const colors = ['#c9a227', '#9a2029', '#3f5f8a', '#5fae7a', '#e8c766', '#2b2b2e'];
+  const codeLength = 4;
+  const secret = Array.from({ length: codeLength }, () => Math.floor(Math.random() * colors.length));
+
+  function score(guess){
+    let black = 0;
+    const secRemain = [];
+    const guessRemain = [];
+    for (let i = 0; i < codeLength; i++){
+      if (guess[i] === secret[i]) black++;
+      else { secRemain.push(secret[i]); guessRemain.push(guess[i]); }
+    }
+    let white = 0;
+    const used = new Array(secRemain.length).fill(false);
+    guessRemain.forEach(g => {
+      const idx = secRemain.findIndex((s, i) => !used[i] && s === g);
+      if (idx !== -1){ used[idx] = true; white++; }
+    });
+    return { black, white };
+  }
+
+  return {
+    title: 'Vault Combination',
+    heading: "Crack the vault's combination",
+    blurb: `MI6 traced the target's vault to this terminal. ${codeLength} colored tumblers, drawn from ${colors.length} possibilities, lock it in a fixed hidden order. Set a guess below and submit it — a dark peg in the reading means one tumbler is the right color in the right slot, a pale peg means a color is right but misplaced. Reason your way to the exact order.`,
+    mount(container, onSolved, feedback){
+      let slots = new Array(codeLength).fill(null);
+      let attempts = 0;
+
+      container.innerHTML = `
+        <div class="mm-row" id="mmPicker">
+          ${colors.map((c, i) => `<button class="mm-swatch" data-c="${i}" style="background:${c}" type="button"></button>`).join('')}
+        </div>
+        <div class="mm-row" id="mmSlots">
+          ${Array.from({ length: codeLength }).map((_, i) => `<button class="mm-slot" data-slot="${i}" type="button"></button>`).join('')}
+        </div>
+        <div class="mm-row">
+          <button id="mmSubmit" disabled type="button">Submit guess</button>
+          <span class="mm-attempts" id="mmAttempts">Attempts: 0</span>
+        </div>
+        <div class="mm-history" id="mmHistory"></div>
+      `;
+
+      const slotEls = [...container.querySelectorAll('.mm-slot')];
+      const submitBtn = container.querySelector('#mmSubmit');
+      const attemptsEl = container.querySelector('#mmAttempts');
+      const historyEl = container.querySelector('#mmHistory');
+
+      function refreshSlots(){
+        slotEls.forEach((el, i) => {
+          if (slots[i] !== null){
+            el.style.background = colors[slots[i]];
+            el.classList.add('filled');
+          } else {
+            el.style.background = '';
+            el.classList.remove('filled');
+          }
+        });
+        submitBtn.disabled = slots.some(s => s === null);
+      }
+
+      container.querySelectorAll('.mm-swatch').forEach(sw => {
+        sw.addEventListener('click', () => {
+          const emptyIdx = slots.findIndex(s => s === null);
+          if (emptyIdx === -1) return;
+          slots[emptyIdx] = Number(sw.dataset.c);
+          refreshSlots();
+        });
+      });
+
+      slotEls.forEach(el => {
+        el.addEventListener('click', () => {
+          slots[Number(el.dataset.slot)] = null;
+          refreshSlots();
+        });
+      });
+
+      submitBtn.addEventListener('click', () => {
+        if (slots.some(s => s === null)) return;
+        attempts++;
+        attemptsEl.textContent = `Attempts: ${attempts}`;
+        const { black, white } = score(slots);
+
+        const row = document.createElement('div');
+        row.className = 'mm-history-row';
+        row.innerHTML = `
+          <div class="mm-history-guess">${slots.map(c => `<span class="mm-mini-dot" style="background:${colors[c]}"></span>`).join('')}</div>
+          <div class="mm-mini-grid">${Array.from({ length: codeLength }).map((_, i) => {
+            if (i < black) return '<span class="mm-mini black"></span>';
+            if (i < black + white) return '<span class="mm-mini white"></span>';
+            return '<span class="mm-mini none"></span>';
+          }).join('')}</div>
+        `;
+        historyEl.prepend(row);
+
+        if (black === codeLength){
+          feedback.style.color = 'var(--signal)';
+          feedback.textContent = 'The vault clicks open.';
+          submitBtn.disabled = true;
+          slotEls.forEach(el => el.disabled = true);
+          container.querySelectorAll('.mm-swatch').forEach(el => el.disabled = true);
+          onSolved();
+        } else {
+          slots = new Array(codeLength).fill(null);
+          refreshSlots();
+        }
+      });
+
+      refreshSlots();
+    }
+  };
+}
+
+/* ---- Trial: enigma intercept (cipher wheel) ---- */
+function buildCipherWheelLevel(){
+  const words = ['compass', 'anchor', 'harbor', 'voyage', 'sextant', 'lantern', 'rudder', 'current', 'horizon', 'mariner', 'schooner', 'plunder', 'starboard', 'cutlass', 'agent', 'silencer', 'briefcase', 'dossier'];
+  const word = words[Math.floor(Math.random() * words.length)];
+  const shift = 1 + Math.floor(Math.random() * 25);
+
+  function shiftChar(ch, n){
+    const code = ch.charCodeAt(0) - 97;
+    return String.fromCharCode(((code + n) % 26 + 26) % 26 + 97);
+  }
+  const cipher = word.split('').map(c => shiftChar(c, shift)).join('');
+
+  return {
+    title: 'Enigma Intercept',
+    heading: 'Decode the intercepted transmission',
+    blurb: "Q's cryptographers intercepted this transmission, but the cipher wheel's readout is jammed — it won't show you a live decode. Every letter has been shifted by the same fixed amount around the alphabet. Turn the dial by feel, then lock in a reading to test it; a miss only tells you it's wrong.",
+    mount(container, onSolved, feedback){
+      let offset = 0;
+
+      container.innerHTML = `
+        <div class="cipher-display">${cipher.toUpperCase()}</div>
+        <div class="cipher-controls">
+          <button class="wheel-btn" id="rotLeft" type="button">⟲</button>
+          <span class="cipher-offset" id="offsetLabel">shift 0</span>
+          <button class="wheel-btn" id="rotRight" type="button">⟳</button>
+        </div>
+        <div class="answer-row">
+          <button id="lockBtn" type="button">Lock in this reading</button>
+        </div>
+      `;
+
+      const offsetLabel = container.querySelector('#offsetLabel');
+
+      function decode(){
+        return cipher.split('').map(c => shiftChar(c, -offset)).join('');
+      }
+      function refresh(){
+        offsetLabel.textContent = `shift ${offset}`;
+      }
+
+      container.querySelector('#rotLeft').addEventListener('click', () => { offset = (offset + 25) % 26; refresh(); });
+      container.querySelector('#rotRight').addEventListener('click', () => { offset = (offset + 1) % 26; refresh(); });
+
+      container.tabIndex = 0;
+      container.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft'){ offset = (offset + 25) % 26; refresh(); }
+        if (e.key === 'ArrowRight'){ offset = (offset + 1) % 26; refresh(); }
+      });
+
+      container.querySelector('#lockBtn').addEventListener('click', () => {
+        if (decode() === word){
+          feedback.style.color = 'var(--signal)';
+          feedback.textContent = 'The wheel clicks true.';
+          onSolved();
+        } else {
+          feedback.style.color = 'var(--red-light)';
+          feedback.textContent = 'Not a real word at this shift — keep turning.';
+        }
+      });
+
+      refresh();
+    }
+  };
+}
+
+/* ---- Trial: recovered blueprint (sliding tile puzzle) ---- */
+function buildSlidingPuzzleLevel(){
+  const size = 4;
+  const solved = Array.from({ length: size * size - 1 }, (_, i) => i + 1).concat(0);
+  let board = solved.slice();
+
+  function neighbors(pos){
+    const r = Math.floor(pos / size), c = pos % size;
+    const list = [];
+    if (r > 0) list.push(pos - size);
+    if (r < size - 1) list.push(pos + size);
+    if (c > 0) list.push(pos - 1);
+    if (c < size - 1) list.push(pos + 1);
+    return list;
+  }
+
+  // shuffle via a random walk of legal moves from the solved state,
+  // which guarantees the scramble is always solvable
+  let blank = board.indexOf(0);
+  let lastMove = -1;
+  for (let i = 0; i < 200; i++){
+    const opts = neighbors(blank).filter(n => n !== lastMove);
+    const pick = opts[Math.floor(Math.random() * opts.length)];
+    [board[blank], board[pick]] = [board[pick], board[blank]];
+    lastMove = blank;
+    blank = pick;
+  }
+
+  return {
+    title: 'Recovered Blueprint',
+    heading: 'Reassemble the stolen blueprint',
+    blurb: 'Fragments of the enemy base blueprint were recovered badly scrambled. Click any tile next to the empty gap to slide it, until the tiles read 1 through 15 in order, left to right, top to bottom.',
+    mount(container, onSolved, feedback){
+      let moves = 0;
+
+      container.innerHTML = `
+        <div class="slide-grid" id="slideGrid"></div>
+        <div class="slide-moves" id="slideMoves">Moves: 0</div>
+      `;
+      const grid = container.querySelector('#slideGrid');
+      const movesEl = container.querySelector('#slideMoves');
+
+      function render(){
+        grid.innerHTML = '';
+        board.forEach((v, i) => {
+          const tile = document.createElement('div');
+          tile.className = 'slide-tile' + (v === 0 ? ' blank' : '');
+          tile.textContent = v === 0 ? '' : v;
+          tile.dataset.i = i;
+          grid.appendChild(tile);
+        });
+      }
+
+      grid.addEventListener('click', e => {
+        const tile = e.target.closest('.slide-tile');
+        if (!tile) return;
+        const i = Number(tile.dataset.i);
+        const blankIdx = board.indexOf(0);
+        if (neighbors(blankIdx).includes(i)){
+          [board[i], board[blankIdx]] = [board[blankIdx], board[i]];
+          moves++;
+          movesEl.textContent = `Moves: ${moves}`;
+          render();
+          if (board.every((v, idx) => v === solved[idx])){
+            feedback.style.color = 'var(--signal)';
+            feedback.textContent = 'The blueprint is whole again.';
+            grid.style.pointerEvents = 'none';
+            onSolved();
+          }
+        }
+      });
+
+      render();
+    }
+  };
+}
+
+/* ---- Trial: compound infiltration (generated maze) ---- */
+function buildMazeLevel(){
+  const cols = 11, rows = 11;
+  const cells = Array.from({ length: rows * cols }, () => ({ top: true, right: true, bottom: true, left: true, visited: false }));
+  const idx = (r, c) => r * cols + c;
+
+  (function carve(r, c){
+    cells[idx(r, c)].visited = true;
+    const dirs = [
+      { dr: -1, dc: 0, wall: 'top', opp: 'bottom' },
+      { dr: 1, dc: 0, wall: 'bottom', opp: 'top' },
+      { dr: 0, dc: -1, wall: 'left', opp: 'right' },
+      { dr: 0, dc: 1, wall: 'right', opp: 'left' }
+    ];
+    shuffleArray(dirs);
+    for (const d of dirs){
+      const nr = r + d.dr, nc = c + d.dc;
+      if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+      if (cells[idx(nr, nc)].visited) continue;
+      cells[idx(r, c)][d.wall] = false;
+      cells[idx(nr, nc)][d.opp] = false;
+      carve(nr, nc);
+    }
+  })(0, 0);
+
+  return {
+    title: 'Compound Infiltration',
+    heading: 'Navigate to the extraction point',
+    blurb: "You're inside the compound in total blackout — the corridor walls are there, but you can't see them. Use the arrow keys (or the buttons below) to move from your position to the extraction point. A blocked step won't move you; feel your way through by trial and error.",
+    mount(container, onSolved, feedback){
+      const pos = { r: 0, c: 0 };
+      const exit = { r: rows - 1, c: cols - 1 };
+
+      container.innerHTML = `
+        <div class="maze-wrap">
+          <div class="maze-grid" id="mazeGrid" style="grid-template-columns:repeat(${cols}, 26px); grid-template-rows:repeat(${rows}, 26px);" tabindex="0"></div>
+        </div>
+        <div class="maze-dpad">
+          <button data-d="up" type="button">▲</button>
+          <div class="maze-dpad-mid">
+            <button data-d="left" type="button">◀</button>
+            <button data-d="right" type="button">▶</button>
+          </div>
+          <button data-d="down" type="button">▼</button>
+        </div>
+        <div class="maze-hint">arrow keys / WASD also work</div>
+      `;
+
+      const grid = container.querySelector('#mazeGrid');
+
+      function render(){
+        grid.innerHTML = '';
+        cells.forEach((cell, i) => {
+          const r = Math.floor(i / cols), c = i % cols;
+          const div = document.createElement('div');
+          div.className = 'maze-cell';
+          if (r === exit.r && c === exit.c) div.classList.add('maze-exit');
+          if (r === pos.r && c === pos.c) div.classList.add('maze-player');
+          grid.appendChild(div);
+        });
+      }
+
+      function move(dir){
+        const cell = cells[idx(pos.r, pos.c)];
+        if (dir === 'up' && !cell.top) pos.r--;
+        else if (dir === 'down' && !cell.bottom) pos.r++;
+        else if (dir === 'left' && !cell.left) pos.c--;
+        else if (dir === 'right' && !cell.right) pos.c++;
+        render();
+        if (pos.r === exit.r && pos.c === exit.c){
+          feedback.style.color = 'var(--signal)';
+          feedback.textContent = 'Extraction point reached.';
+          onSolved();
+        }
+      }
+
+      grid.addEventListener('keydown', e => {
+        const map = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', w: 'up', s: 'down', a: 'left', d: 'right' };
+        if (map[e.key]){ e.preventDefault(); move(map[e.key]); }
+      });
+      container.querySelectorAll('.maze-dpad button').forEach(b => {
+        b.addEventListener('click', () => move(b.dataset.d));
+      });
+
+      render();
+      grid.focus();
+    }
+  };
+}
+
+/* ---- Trial: security override (lights-out style toggle grid) ---- */
+function buildLightsOutLevel(){
+  const n = 5;
+  let grid = new Array(n * n).fill(false);
+  const idx = (r, c) => r * n + c;
+
+  function toggle(r, c){
+    const spots = [[r, c], [r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]];
+    spots.forEach(([rr, cc]) => {
+      if (rr >= 0 && rr < n && cc >= 0 && cc < n) grid[idx(rr, cc)] = !grid[idx(rr, cc)];
+    });
+  }
+
+  // scramble by applying random toggles from an all-off grid —
+  // toggling is its own inverse, so this state is always solvable back to all-off
+  const scrambleMoves = 8 + Math.floor(Math.random() * 5);
+  for (let i = 0; i < scrambleMoves; i++){
+    toggle(Math.floor(Math.random() * n), Math.floor(Math.random() * n));
+  }
+  if (grid.every(v => !v)) toggle(Math.floor(Math.random() * n), Math.floor(Math.random() * n));
+
+  return {
+    title: 'Security Override',
+    heading: 'Kill every panel on the grid',
+    blurb: 'The alarm grid has tripped. Striking a panel flips it and every panel directly beside it. Find the sequence of strikes that leaves the entire grid dark.',
+    mount(container, onSolved, feedback){
+      container.innerHTML = `
+        <div class="lo-status" id="loStatus">Panels lit: <span id="loCount"></span></div>
+        <div class="lo-grid" id="loGrid" style="grid-template-columns:repeat(${n}, 44px); grid-template-rows:repeat(${n}, 44px);"></div>
+      `;
+      const gridEl = container.querySelector('#loGrid');
+      const countEl = container.querySelector('#loCount');
+
+      function render(){
+        gridEl.innerHTML = '';
+        countEl.textContent = grid.filter(v => v).length;
+        grid.forEach((lit, i) => {
+          const r = Math.floor(i / n), c = i % n;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'lo-cell' + (lit ? ' lit' : '');
+          btn.dataset.r = r;
+          btn.dataset.c = c;
+          gridEl.appendChild(btn);
+        });
+      }
+
+      gridEl.addEventListener('click', e => {
+        const cell = e.target.closest('.lo-cell');
+        if (!cell) return;
+        toggle(Number(cell.dataset.r), Number(cell.dataset.c));
+        render();
+        if (grid.every(v => !v)){
+          feedback.style.color = 'var(--signal)';
+          feedback.textContent = 'Grid dark. Alarm disabled.';
+          gridEl.style.pointerEvents = 'none';
+          onSolved();
+        }
+      });
+
+      render();
+    }
+  };
+}
+
+/* ---- Trial: signal interception (frequency tuner) ---- */
+function buildFrequencyLevel(){
+  const target = 1 + Math.floor(Math.random() * 200);
+
+  return {
+    title: 'Signal Interception',
+    heading: 'Tune to the correct frequency',
+    blurb: 'An encrypted transmission is hiding somewhere between 1 and 200 MHz. The receiver is degraded — a scan only tells you whether to tune higher or lower, with no sense of how close you are. Narrow it down and lock the exact frequency.',
+    mount(container, onSolved, feedback){
+      container.innerHTML = `
+        <div class="freq-row">
+          <input type="number" class="freq-input" id="freqInput" min="1" max="200" placeholder="1–200">
+          <button id="freqScan" type="button">Scan</button>
+        </div>
+        <div class="freq-readout" id="freqReadout">No scan yet.</div>
+      `;
+
+      const input = container.querySelector('#freqInput');
+      const readout = container.querySelector('#freqReadout');
+
+      function scan(){
+        const guess = Number(input.value);
+        if (!Number.isInteger(guess) || guess < 1 || guess > 200){
+          readout.textContent = 'Enter a whole number between 1 and 200.';
+          return;
+        }
+
+        if (guess === target){
+          readout.style.color = 'var(--signal)';
+          readout.textContent = `Signal locked at ${guess} MHz.`;
+          input.disabled = true;
+          container.querySelector('#freqScan').disabled = true;
+          onSolved();
+        } else if (guess < target){
+          readout.style.color = 'var(--cream-dim)';
+          readout.textContent = 'Tune higher.';
+        } else {
+          readout.style.color = 'var(--cream-dim)';
+          readout.textContent = 'Tune lower.';
+        }
+      }
+
+      container.querySelector('#freqScan').addEventListener('click', scan);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') scan(); });
+    }
+  };
+}
+
+/* ---- Trial: defuse the device (wire-cutting deduction) ---- */
+function buildWireLevel(){
+  const palette = [
+    { name: 'red', hex: '#9a2029' },
+    { name: 'blue', hex: '#3f5f8a' },
+    { name: 'yellow', hex: '#c9a227' },
+    { name: 'green', hex: '#5fae7a' },
+    { name: 'white', hex: '#d8d3c4' },
+    { name: 'purple', hex: '#6b4a8a' }
+  ];
+  const totalWires = 8;
+
+  // exactly one color gets count 1 (the wire to cut); the rest
+  // split the remaining wires across 1-2 colors with count >= 2 each
+  function generateRound(){
+    const pal = shuffleArray(palette.slice());
+    const uniqueColor = pal[0];
+    const remaining = totalWires - 1;
+    const otherColors = [];
+    if (remaining >= 4 && Math.random() < 0.6){
+      const firstCount = 2 + Math.floor(Math.random() * (remaining - 3));
+      otherColors.push({ color: pal[1], count: firstCount });
+      otherColors.push({ color: pal[2], count: remaining - firstCount });
+    } else {
+      otherColors.push({ color: pal[1], count: remaining });
+    }
+
+    let wires = [uniqueColor];
+    otherColors.forEach(({ color, count }) => {
+      for (let i = 0; i < count; i++) wires.push(color);
+    });
+    wires = shuffleArray(wires);
+    const correctIndex = wires.findIndex(w => w.name === uniqueColor.name);
+    return { wires, correctIndex };
+  }
+
+  return {
+    title: 'Defuse the Device',
+    heading: 'Cut the correct wire',
+    blurb: `The device is rigged with ${totalWires} wires. Every color below appears at least twice — except one. Identify the wire whose color is unique among the set, and cut it. Cut the wrong one and the device re-routes itself into an entirely fresh wire set — you'll have to recount from scratch.`,
+    mount(container, onSolved, feedback){
+      let round = generateRound();
+      let solved = false;
+
+      function render(){
+        container.innerHTML = `
+          <div class="wire-rack" id="wireRack">
+            ${round.wires.map((w, i) => `
+              <div class="wire-row" data-i="${i}">
+                <span class="wire-label">${i + 1}</span>
+                <div class="wire-strip" style="background:${w.hex}"></div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      container.addEventListener('click', e => {
+        if (solved) return;
+        const row = e.target.closest('.wire-row');
+        if (!row) return;
+        const i = Number(row.dataset.i);
+        if (i === round.correctIndex){
+          solved = true;
+          feedback.style.color = 'var(--signal)';
+          feedback.textContent = 'Wire cut. Device disarmed.';
+          container.querySelectorAll('.wire-row').forEach(r => r.style.pointerEvents = 'none');
+          row.style.opacity = '0.4';
+          onSolved();
+        } else {
+          feedback.style.color = 'var(--red-light)';
+          feedback.textContent = 'Wrong wire — the device re-routed itself. Recount the fresh set.';
+          round = generateRound();
+          render();
+        }
+      });
+
+      render();
+    }
+  };
+}
+
+function buildLevels(){
+  return [
+    buildMemoryLevel(),
+    buildMastermindLevel(),
+    buildCipherWheelLevel(),
+    buildSlidingPuzzleLevel(),
+    buildMazeLevel(),
+    buildLightsOutLevel(),
+    buildFrequencyLevel(),
+    buildWireLevel()
+  ];
+}
+
+/* ============================================================
+   Wiring
+   ============================================================ */
+
+function downloadDossier(){
+  window.open('https://drive.google.com/uc?export=download&id=18Y4sXqA2fYULC3IkKJvj4BJHkS2x1ilX', '_blank');
+}
+
+function renderPath(){
+  const pathEl = document.getElementById('path');
+  const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+  pathEl.innerHTML = '';
+  LEVELS.forEach((_, i) => {
+    if (i > 0){
+      const c = document.createElement('div');
+      c.className = 'connector';
+      pathEl.appendChild(c);
+    }
+    const leg = document.createElement('div');
+    leg.className = 'leg' + (i < current ? ' done' : i === current ? ' current' : '');
+    leg.textContent = numerals[i] || (i + 1);
+    pathEl.appendChild(leg);
+  });
+  document.getElementById('legNum').textContent = current + 1;
+  document.getElementById('legTotal').textContent = LEVELS.length;
+}
+
+function renderClue(){
+  const level = LEVELS[current];
+  const card = document.getElementById('clueCard');
+  card.innerHTML = `
+    <div class="eyebrow">${level.title}</div>
+    <h2>${level.heading}</h2>
+    <p class="instructions">${level.blurb}</p>
+    <div class="puzzle-mount" id="puzzleMount"></div>
+    <div class="feedback" id="feedback"></div>
+  `;
+
+  const mount = document.getElementById('puzzleMount');
+  const feedback = document.getElementById('feedback');
+  let solvedAlready = false;
+
+  level.mount(mount, () => {
+    if (solvedAlready) return;
+    solvedAlready = true;
+    current++;
+    if (current >= LEVELS.length) downloadDossier();
+    setTimeout(() => {
+      if (current >= LEVELS.length){
+        huntEl.style.display = 'none';
+        treasureEl.style.display = 'block';
+      } else {
+        renderPath();
+        renderClue();
+      }
+    }, 700);
+  }, feedback);
+}
+</script>
+</body>
+</html>
